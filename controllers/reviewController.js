@@ -42,3 +42,68 @@ export function getReviews(req, res){
         })
     }
 }
+
+
+export function deleteReview(req, res){
+    const email = req.params.email;
+
+    if(req.user == null){
+        res.status(401).json({
+            message: "Please login and try again"
+        });
+        return;
+    }
+
+    if(req.user.role == "admin"){
+        Review.deleteOne({ email: email }).then(() => {
+            res.json({ message: "Review deleted successfully" });
+        }).catch(() => {
+            res.status(500).json({ error: "Error deleting review" });
+        })
+        return;
+    }
+
+    if(req.user.role == "customer"){
+        if(req.user.email == email){
+            Review.deleteOne({ email: email }).then(() => {
+                res.json({ message: "Review deleted successfully" });
+            }).catch(() => {
+                res.status(500).json({ error: "Error deleting review" });
+            })
+        }else{
+            res.status(403).json({
+                message: "Access denied. You can delete only your review"
+            })
+        }
+    }
+    
+}
+
+
+export function approveReview(req, res){
+    const email = req.params.email;
+
+    if(req.user == null){
+        res.status(401).json({
+            message: "Please login and try again"
+        });
+        return;
+    }
+
+    if(req.user.role == "admin"){
+        Review.updateOne({ 
+            email: email,
+        }, {
+            isApproved: true,
+        }).then(() => {
+            res.json({ message: "Review approved successfully" });
+        }).catch(() => {
+            res.status(500).json({ error: "Error approving review" });
+        })
+    }else{
+        res.status(403).json({
+            message: "Access denied. Admins only"
+        })
+    }
+
+}
