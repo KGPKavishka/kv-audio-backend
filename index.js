@@ -22,8 +22,7 @@ app.use((req, res, next)=>{
     ("Authorization")
 
     if(token!=null){
-        token = token.replace("Bearer ",
-        "")
+        token = token.replace("Bearer ","")
         jwt.verify(token, process.env.JWT_SECRET,
         (err,decoded)=>{
             if(!err){
